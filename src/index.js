@@ -44,8 +44,10 @@ app.post('/sign-up', async (request, response) => {
   }
 
   const passwordEncrypted = bcrypt.hashSync(user.password, 10);
+  const confirmPasswordEncrypted = bcrypt.hashSync(user.confirmPassword, 10);
 
-  await db.collection('users').insertOne({ ...user, password: passwordEncrypted });
+
+  await db.collection('users').insertOne({ ...user, password: passwordEncrypted, confirmPassword: confirmPasswordEncrypted});
   response.status(201).send("User created successfully!");
 
 });
