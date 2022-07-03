@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import chalk from 'chalk';
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
+import dayjs from 'dayjs';
 
 dotenv.config();
 
@@ -49,6 +50,67 @@ app.post('/sign-up', async (request, response) => {
 
   await db.collection('users').insertOne({ ...user, password: passwordEncrypted, confirmPassword: confirmPasswordEncrypted});
   response.status(201).send("User created successfully!");
+
+});
+
+app.post('/sign-in', async (request, response) => {
+
+  const loggedInUser = request.body;
+
+  const loggedInUserSchema = joi.object({
+    email: joi.string().email().required(),
+    password: joi.string().required()
+  });
+
+  const { error } = loggedInUserSchema.validate(loggedInUser);
+
+  if(error) {
+    return response.sendStatus(422);
+  }
+
+  const userExistsDatabase = await db.collection('users').findOne({ email: loggedInUser.email});
+
+  if(userExistsDatabase && bcrypt.compareSync(loggedInUser.password, userExistsDatabase.password)) {
+    const token = uuid(); 
+
+    await db.collection('sessions').insertOne({
+      token,
+      userId: userExistsDatabase._id
+    });
+
+    return response.status(201).send({ token});
+  } else {
+    return response.status(401).send("Incorrect password and/or email!");
+  }
+});
+
+app.post('/transactions', async (request, response) => {
+  const transaction = request.body;
+
+  const { authorization } = request.headers;
+  const token = authorization?.replace('Bearer ', '');
+
+  const transactionSchema = joi.object({
+    type: joi.string().required(),
+    value: joi.string().required(),
+    description: joi.string().required()
+  });
+
+  const { error } = transactionSchema.validate(transaction, {abortEarly: false});
+
+  if(error) {
+    return response.sendStatus(422);
+  }
+
+  const session = await db.collection('sessions').findOne({ token });
+
+  if(!session) {
+    return response.sendStatus(401);
+  }
+
+  await db.collection('transactions')
+  .insertOne({ ...transaction, dayMonth: dayjs().format("DD/MM"), userId: session.userId});
+  response.status(201).send('Transaction created successfully');
 
 });
 
