@@ -114,6 +114,25 @@ app.post('/transactions', async (request, response) => {
 
 });
 
+app.get('/transactions', async (request, response) => {
+  const { authorization } = request.headers;
+  const token = authorization?.replace('Bearer ', '');
+
+  const session = await db.collection('sessions').findOne({ token });
+
+  if(!session) {
+    return response.sendStatus(401);
+  }
+
+  const transactions = await db
+    .collection('transactions')
+    .find({ userId: new ObjectId(session.userId) })
+    .toArray();
+
+  response.send(transactions);
+
+});
+
 const PORT = process.env.PORT || 5008
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
