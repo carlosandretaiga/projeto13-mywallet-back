@@ -6,7 +6,12 @@ dotenv.config();
 
 const database = process.env.MONGO_DATABASE;
 let db = null;
-const mongoClient = new MongoClient(process.env.MONGO_URI);
+const mongoClient = new MongoClient(process.env.MONGO_URI,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  () => {
+    console.log("Connected to DB!");
+  }
+  );
 const promise = mongoClient.connect();
 promise.then(() => {
   db = mongoClient.db(database);
