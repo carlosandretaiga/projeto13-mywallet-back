@@ -70,6 +70,18 @@ app.post('/sign-in', async (request, response) => {
 
   const userExistsDatabase = await db.collection('users').findOne({ email: loggedInUser.email});
 
+  const TransactionsExistsDatabase = await db.collection('transactions')
+  .find({ userId: new ObjectId(userExistsDatabase._id) }).toArray();
+  
+
+  console.log(TransactionsExistsDatabase);
+
+  const UserName = {
+    name: userExistsDatabase.name
+  }; 
+
+  //console.log(UserName);
+
   if(userExistsDatabase && bcrypt.compareSync(loggedInUser.password, userExistsDatabase.password)) {
     const token = uuid(); 
 
@@ -78,7 +90,7 @@ app.post('/sign-in', async (request, response) => {
       userId: userExistsDatabase._id
     });
 
-    return response.status(201).send({ token});
+    return response.status(201).send({ token, UserName, TransactionsExistsDatabase});
   } else {
     return response.status(401).send("Incorrect password and/or email!");
   }
@@ -96,7 +108,7 @@ app.post('/transactions', async (request, response) => {
     description: joi.string().required()
   });
 
-  const { error } = transactionSchema.validate(transaction, {abortEarly: false});
+  const { error } = transactionSchema.validate(transaction);
 
   if(error) {
     return response.sendStatus(422);
