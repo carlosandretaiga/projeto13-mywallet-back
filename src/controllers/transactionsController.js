@@ -65,18 +65,20 @@ export async function createTransactions(request, response) {
 }
 
 export async function getTransactions(request, response) {
-  const { authorization } = request.headers;
-  const token = authorization?.replace('Bearer ', '');
+ /*  const { authorization } = request.headers;
+  const token = authorization?.replace('Bearer ', ''); */
 
-  const session = await db.collection('sessions').findOne({ token });
+/*   const session = await db.collection('sessions').findOne({ token });
 
   if(!session) {
     return response.sendStatus(401);
-  }
+  } */
+
+  const session = response.locals.session; 
 
   const transactions = await db
     .collection('transactions')
-    .find({ userId: new ObjectId(session.userId) })
+    .find({ userId: new objectId(session.userId) })
     .toArray();
 
   response.send(transactions);

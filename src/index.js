@@ -2,8 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv'
 import chalk from 'chalk';
-import transactionsRouter from './routes/transactionsRouter.js'
-import authRouter from './routes/authRouter.js'
+import transactionsRouter from './routes/transactionsRouter.js';
+import authRouter from './routes/authRouter.js';
+//import validateUser from './middlewares/validateUser.js';
 
 //import dayjs from 'dayjs';
 
@@ -16,8 +17,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use(authRouter)
-app.use(transactionsRouter)
+/* app.use(validateUser); */
+
+app.use(authRouter);
+app.use(transactionsRouter);
 
 
 /* app.post('/sign-up', createUser);
