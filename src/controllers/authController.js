@@ -69,7 +69,7 @@ export async function loginUser(request, response) {
   .find({ userId: new objectId(userExistsDatabase._id) }).toArray();
   
 
-  console.log(transactionsExistsDatabase);
+  //console.log(transactionsExistsDatabase);
 
   const UserName = {
     name: userExistsDatabase.name
