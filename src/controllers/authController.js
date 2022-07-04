@@ -1,13 +1,14 @@
 
-
-import { MongoClient, ObjectId } from 'mongodb';
+//import { MongoClient, ObjectId } from 'mongodb';
+import {db, objectId} from '../databases/mongo.js';
+//import db from '../databases/mongo.js'
 import joi from 'joi';
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
-import dotenv from 'dotenv'
-import chalk from 'chalk';
+//import dotenv from 'dotenv'
+//import chalk from 'chalk';
 
-dotenv.config();
+/* dotenv.config();
 
 const database = process.env.MONGO_DATABASE;
 let db = null;
@@ -19,7 +20,9 @@ promise.then(() => {
 });
 promise.catch((error) => {
   console.log(chalk.red.bold("An error occurred, did not connect to Mongo!"));
-});
+}); */
+
+
 export async function createUser(request, response) {
   const user = request.body;
 
@@ -63,7 +66,7 @@ export async function loginUser(request, response) {
   const userExistsDatabase = await db.collection('users').findOne({ email: loggedInUser.email});
 
   const transactionsExistsDatabase = await db.collection('transactions')
-  .find({ userId: new ObjectId(userExistsDatabase._id) }).toArray();
+  .find({ userId: new objectId(userExistsDatabase._id) }).toArray();
   
 
   console.log(transactionsExistsDatabase);

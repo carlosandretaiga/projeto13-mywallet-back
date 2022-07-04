@@ -1,12 +1,15 @@
 
-import { MongoClient, ObjectId } from 'mongodb';
+//import { MongoClient, ObjectId } from 'mongodb';
+import { db, objectId} from '../databases/mongo.js';
 import joi from 'joi';
-import bcrypt from 'bcrypt';
-import { v4 as uuid } from 'uuid';
-import dotenv from 'dotenv'
+//import bcrypt from 'bcrypt';
+//import { v4 as uuid } from 'uuid';
+//import dotenv from 'dotenv'
+
+import dayjs from 'dayjs';
 import chalk from 'chalk';
 
-dotenv.config();
+/* dotenv.config();
 
 const database = process.env.MONGO_DATABASE;
 let db = null;
@@ -18,8 +21,8 @@ promise.then(() => {
 });
 promise.catch((error) => {
   console.log(chalk.red.bold("An error occurred, did not connect to Mongo!"));
-});
-
+});  */
+ 
 export async function createTransactions(request, response) {
   const transaction = request.body;
 
@@ -48,7 +51,7 @@ export async function createTransactions(request, response) {
   .insertOne({ ...transaction, dayMonth: dayjs().format("DD/MM"), userId: session.userId});
 
   const transactions = await db.collection('transactions')
-  .find({ userId: new ObjectId(session.userId) }).toArray();
+  .find({ userId: new objectId(session.userId) }).toArray();
 
   console.log(transactions);
 
