@@ -70,11 +70,11 @@ app.post('/sign-in', async (request, response) => {
 
   const userExistsDatabase = await db.collection('users').findOne({ email: loggedInUser.email});
 
-  const TransactionsExistsDatabase = await db.collection('transactions')
+  const transactionsExistsDatabase = await db.collection('transactions')
   .find({ userId: new ObjectId(userExistsDatabase._id) }).toArray();
   
 
-  console.log(TransactionsExistsDatabase);
+  console.log(transactionsExistsDatabase);
 
   const UserName = {
     name: userExistsDatabase.name
@@ -90,7 +90,7 @@ app.post('/sign-in', async (request, response) => {
       userId: userExistsDatabase._id
     });
 
-    return response.status(201).send({ token, UserName, TransactionsExistsDatabase});
+    return response.status(201).send({ token, UserName, transactionsExistsDatabase});
   } else {
     return response.status(401).send("Incorrect password and/or email!");
   }
@@ -122,7 +122,17 @@ app.post('/transactions', async (request, response) => {
 
   await db.collection('transactions')
   .insertOne({ ...transaction, dayMonth: dayjs().format("DD/MM"), userId: session.userId});
-  response.status(201).send('Transaction created successfully');
+
+  const transactions = await db.collection('transactions')
+  .find({ userId: new ObjectId(session.userId) }).toArray();
+
+  console.log(transactions);
+
+  //const transactions = await { ...transaction, dayMonth: dayjs().format("DD/MM"), userId: session.userId}
+
+
+  response.send(transactions);
+  //response.status(201).send('Transaction created successfully', transactions);
 
 });
 
